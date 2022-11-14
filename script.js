@@ -6,6 +6,8 @@ const websiteNameEl = document.getElementById('website-name');
 const websiteUrlEl = document.getElementById('website-url');
 const bookmarksContainer = document.getElementById('bookmarks-container');
 
+let bookmarks = [];
+
 function showModal() {
     modal.classList.add('show-modal');
     websiteNameEl.focus();
@@ -32,6 +34,21 @@ function validateForm(nameValue, urlValue) {
     return true;
 }
 
+function fetchBookmarks() {
+    if(localStorage.getItem('bookmarks')) {
+        bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+    } else {
+        bookmarks = [
+            {
+                name: 'Google',
+                url: 'https://google.com',
+            }
+        ];
+
+        localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    }
+}
+
 function storeBookmark(e) {
     e.preventDefault();
     const nameValue = websiteNameEl.value;
@@ -45,7 +62,19 @@ function storeBookmark(e) {
         return false;
     }
 
-    validateForm(nameValue, urlValue);
+    const bookmark = {
+        name: nameValue,
+        url: urlValue,
+    };
+
+    bookmarks.push(bookmark);
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    fetchBookmarks();
+    bookmarkForm.reset();
+    websiteNameEl.focus();
 }
 
 bookmarkForm.addEventListener('submit', storeBookmark);
+
+// On Load
+fetchBookmarks();
